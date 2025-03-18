@@ -7,6 +7,7 @@ const dataViewDiv = document.getElementById("dataView");
 const btnPrev = document.getElementById("btnPrev");
 const btnNext = document.getElementById("btnNext");
 const showTimelineDiv = document.getElementById("showTimelineDiv");
+const btnNavigationDiv = document.getElementById("btnNavigationDiv");
 
 let selectedTrend;
 let currentDate;
@@ -163,9 +164,11 @@ function showSelectedTrend() {
     case "Day":
       const today = getTodayDate();
       currentDate = today;
+      showNextPrevButton();
       showDayData();
       break;
     case "Week":
+      hideNextPrevButton();
       showWeekData();
       break;
     case "Month":
@@ -189,7 +192,10 @@ btnNext.addEventListener("click", function () {
     handleDayNavigation(1);
     //disbale bext button if current date is today
     const today = getTodayDate();
-    if (currentDate === today) disableButton(btnNext);
+    if (currentDate === today) {
+      disableButton(btnNext);
+      return;
+    }
 
     //enable prev button incase it is disabled
     enableButton(btnPrev);
@@ -205,8 +211,27 @@ function showDayData(day = "") {
 
   displayData(foundedData);
 }
-function showWeekData() {}
-function showMonthData() {}
+function showWeekData() {
+  //find last 7 day's data
+  const today = getTodayDate();
+  currentDate = today;
+  const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
+    currentDate,
+    -7
+  );
+
+  displayData(weeklyData.reverse());
+}
+function showMonthData() {
+  const today = getTodayDate();
+  currentDate = today;
+  const { data: monthlyData, newCurrentDate } = getDataFromStartDate(
+    currentDate,
+    -30
+  );
+
+  displayData(monthlyData.reverse());
+}
 
 function displayData(arr) {
   dataViewDiv.innerHTML = "";
@@ -216,15 +241,18 @@ function displayData(arr) {
 }
 
 function findDataByOffset(dateStr, offset) {
-  const targetDate = new Date(dateStr);
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const targetDate = new Date(year, month - 1, day); // month is 0-based
+
   targetDate.setDate(targetDate.getDate() + offset);
 
-  const formatted = targetDate.toISOString().split("T")[0]; // Format to YYYY-MM-DD
+  const formatted = targetDate.toISOString().split("T")[0];
 
   const dataToReturn = {
     dataArray: data.filter((entry) => entry.date === formatted),
     newDate: formatted,
   };
+
   return dataToReturn;
 }
 
@@ -268,6 +296,18 @@ function enableButton(element) {
   element.classList.remove("disable", "opacity-50", "cursor-not-allowed");
 }
 
+function hideNextPrevButton() {
+  btnPrev.classList.add("hidden");
+  btnNext.classList.add("hidden");
+  btnNavigationDiv.classList.add("justify-center");
+}
+
+function showNextPrevButton() {
+  btnPrev.classList.remove("hidden");
+  btnNext.classList.remove("hidden");
+  btnNavigationDiv.classList.remove("justify-center");
+}
+
 function createLabel(dateToDisplay, mood, emoji) {
   const label = document.createElement("label");
 
@@ -275,4 +315,41 @@ function createLabel(dateToDisplay, mood, emoji) {
   label.textContent = `${dateToDisplay} - ${mood}  ${emoji}`;
 
   dataViewDiv.appendChild(label);
+}
+
+function getDataFromStartDate(startDateStr, numberOfDays) {
+  const [year, month, day] = startDateStr.split("-").map(Number);
+  const baseDate = new Date(year, month - 1, day); // The given date
+  baseDate.setHours(0, 0, 0, 0);
+
+  // Determine the range boundaries
+  let rangeStart, rangeEnd;
+  if (numberOfDays >= 0) {
+    rangeStart = new Date(baseDate);
+    rangeEnd = new Date(baseDate);
+    // Move rangeEnd to the exact number of days forward (exclusive of the end day)
+    rangeEnd.setDate(baseDate.getDate() + numberOfDays);
+    rangeEnd.setHours(0, 0, 0, 0);
+  } else {
+    rangeEnd = new Date(baseDate);
+    rangeStart = new Date(baseDate);
+    // Move rangeStart backward by the absolute value of numberOfDays
+    rangeStart.setDate(baseDate.getDate() + numberOfDays); // numberOfDays is negative
+    rangeStart.setHours(0, 0, 0, 0);
+  }
+
+  const foundedData = data.filter((obj) => {
+    const entryDate = new Date(obj["date"]);
+    entryDate.setHours(0, 0, 0, 0);
+    // Include dates >= rangeStart and < rangeEnd (strictly less than rangeEnd)
+    return entryDate >= rangeStart && entryDate < rangeEnd;
+  });
+
+  // Calculate newCurrentDate as rangeEnd (the next day after the last included day)
+  const newCurrentDate = rangeEnd.toISOString().split("T")[0];
+
+  return {
+    data: foundedData,
+    newCurrentDate,
+  };
 }

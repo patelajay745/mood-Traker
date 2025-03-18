@@ -7,7 +7,9 @@
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   </head>
   <body>
-    <div class="h-screen bg-gray-300 w-full flex items-center justify-center">
+    <div
+      class="min-h-screen overflow-auto bg-gray-300 w-full flex items-center justify-center py-10 pt-10"
+    >
       <div
         id="cantainer"
         class="p-10 bg-white rounded-xl shadow-xl flex flex-col gap-4"
@@ -40,26 +42,29 @@
             data-selection="Day"
             class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
           >
-            Day
+            Daily
           </button>
           <button
             data-selection="Week"
             class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
           >
-            Week
+            Weekly
           </button>
           <button
             data-selection="Month"
             class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
           >
-            Month
+            Monthly
           </button>
         </div>
         <div
           id="showTimelineDiv"
           class="bg-slate-200 py-4 flex flex-col text-gray-500 rounded-xl shadow-xl hidden"
         >
-          <div class="mx-8 flex justify-between items-center">
+          <div
+            id="btnNavigationDiv"
+            class="mx-8 flex justify-between items-center"
+          >
             <button class="cursor-pointer" id="btnPrev">◀️</button>
             <label id="selectedTrendLabel">Week View</label>
             <button class="cursor-pointer" id="btnNext">▶️</button>
