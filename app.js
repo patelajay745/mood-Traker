@@ -11,75 +11,20 @@ const btnNavigationDiv = document.getElementById("btnNavigationDiv");
 
 let selectedTrend;
 let currentDate;
+let currentMonth;
 
-// let data = loadData();
-let data = [
-  { emoji: "😐", mood: "neutral", date: "2025-01-17" },
-  { emoji: "😀", mood: "happy", date: "2025-01-18" },
-  { emoji: "😟", mood: "worried", date: "2025-01-19" },
-  { emoji: "😀", mood: "happy", date: "2025-01-20" },
-  { emoji: "😞", mood: "sad", date: "2025-01-21" },
-  { emoji: "🥳", mood: "party", date: "2025-01-22" },
-  { emoji: "😐", mood: "neutral", date: "2025-01-23" },
-  { emoji: "😀", mood: "happy", date: "2025-01-24" },
-  { emoji: "😞", mood: "sad", date: "2025-01-25" },
-  { emoji: "😟", mood: "worried", date: "2025-01-26" },
-  { emoji: "😀", mood: "happy", date: "2025-01-27" },
-  { emoji: "🥳", mood: "party", date: "2025-01-28" },
-  { emoji: "😐", mood: "neutral", date: "2025-01-29" },
-  { emoji: "😀", mood: "happy", date: "2025-01-30" },
-  { emoji: "😞", mood: "sad", date: "2025-01-31" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-01" },
-  { emoji: "😟", mood: "worried", date: "2025-02-02" },
-  { emoji: "😀", mood: "happy", date: "2025-02-03" },
-  { emoji: "😞", mood: "sad", date: "2025-02-04" },
-  { emoji: "🥳", mood: "party", date: "2025-02-05" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-06" },
-  { emoji: "😀", mood: "happy", date: "2025-02-07" },
-  { emoji: "😟", mood: "worried", date: "2025-02-08" },
-  { emoji: "😞", mood: "sad", date: "2025-02-09" },
-  { emoji: "😀", mood: "happy", date: "2025-02-10" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-11" },
-  { emoji: "🥳", mood: "party", date: "2025-02-12" },
-  { emoji: "😀", mood: "happy", date: "2025-02-13" },
-  { emoji: "😟", mood: "worried", date: "2025-02-14" },
-  { emoji: "😞", mood: "sad", date: "2025-02-15" },
-  { emoji: "😀", mood: "happy", date: "2025-02-16" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-17" },
-  { emoji: "🥳", mood: "party", date: "2025-02-18" },
-  { emoji: "😟", mood: "worried", date: "2025-02-19" },
-  { emoji: "😞", mood: "sad", date: "2025-02-20" },
-  { emoji: "😀", mood: "happy", date: "2025-02-21" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-22" },
-  { emoji: "😀", mood: "happy", date: "2025-02-23" },
-  { emoji: "😟", mood: "worried", date: "2025-02-24" },
-  { emoji: "🥳", mood: "party", date: "2025-02-25" },
-  { emoji: "😞", mood: "sad", date: "2025-02-26" },
-  { emoji: "😐", mood: "neutral", date: "2025-02-27" },
-  { emoji: "😀", mood: "happy", date: "2025-02-28" },
-  { emoji: "😟", mood: "worried", date: "2025-03-01" },
-  { emoji: "🥳", mood: "party", date: "2025-03-02" },
-  { emoji: "😞", mood: "sad", date: "2025-03-03" },
-  { emoji: "😀", mood: "happy", date: "2025-03-04" },
-  { emoji: "😐", mood: "neutral", date: "2025-03-05" },
-  { emoji: "😟", mood: "worried", date: "2025-03-06" },
-  { emoji: "🥳", mood: "party", date: "2025-03-07" },
-  { emoji: "😞", mood: "sad", date: "2025-03-08" },
-  { emoji: "😀", mood: "happy", date: "2025-03-09" },
-  { emoji: "😐", mood: "neutral", date: "2025-03-10" },
-  { emoji: "😟", mood: "worried", date: "2025-03-11" },
-  { emoji: "🥳", mood: "party", date: "2025-03-12" },
-  { emoji: "😞", mood: "sad", date: "2025-03-13" },
-  { emoji: "😀", mood: "happy", date: "2025-03-14" },
-  { emoji: "😐", mood: "neutral", date: "2025-03-15" },
-  { emoji: "😟", mood: "worried", date: "2025-03-16" },
-  { emoji: "😀", mood: "happy", date: "2025-03-17" },
-  { emoji: "😀", mood: "happy", date: "2025-03-18" },
-];
+let data;
+
+window.addEventListener("load", async (event) => {
+  await loadData();
+});
 
 //load data from local storage
-function loadData() {
-  return JSON.parse(localStorage.getItem("moodData")) || [];
+async function loadData() {
+  const response = await fetch("./data.json");
+  const dataFromFile = await response.json();
+
+  data = JSON.parse(localStorage.getItem("moodData")) || dataFromFile;
 }
 
 // store data to local storage
@@ -160,18 +105,19 @@ selectionButton.forEach((button) => {
 function showSelectedTrend() {
   selectedTrendLabel.textContent = `${selectedTrend}'s Data`;
   disableButton(btnNext);
+  enableButton(btnPrev);
+  const today = getTodayDate();
   switch (selectedTrend) {
     case "Day":
-      const today = getTodayDate();
       currentDate = today;
       showNextPrevButton();
       showDayData();
       break;
     case "Week":
-      hideNextPrevButton();
-      showWeekData();
+      showWeekData(today);
       break;
     case "Month":
+      currentMonth = getCurrentMonth();
       showMonthData();
       break;
     default:
@@ -180,15 +126,51 @@ function showSelectedTrend() {
 }
 
 btnPrev.addEventListener("click", function () {
+  if (this.classList.contains("disable")) return;
+
   if (selectedTrend === "Day") {
-    if (this.classList.contains("disable")) return;
     handleDayNavigation(-1);
+  } else if (selectedTrend === "Week") {
+    // logic for weekly data
+    currentDate = nextExpectedDate(currentDate, -7);
+
+    const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
+      currentDate,
+      -7
+    );
+
+    displayData(weeklyData);
+
+    //enable nextbutton
+    const today = getTodayDate();
+    if (currentDate !== today) enableButton(btnNext);
+
+    // if last founded data is less then 7 that means it does not have enough data so disable prev button
+    if (weeklyData.length < 7) {
+      disableButton(btnPrev);
+    }
+  } else if (selectedTrend === "Month") {
+    currentMonth = currentMonth - 1;
+    const foundedData = getMonthData(currentMonth);
+
+    displayData(foundedData.reverse());
+    enableButton(btnNext);
+
+    if (foundedData.length <= 0) {
+      disableButton(btnPrev);
+      showError("No Data Found");
+    }
   }
 });
 
 btnNext.addEventListener("click", function () {
+  if (btnNext.classList.contains("disable")) return;
+
+  //enable prev button
+  const today = getTodayDate();
+  if (currentDate !== today) enableButton(btnPrev);
+
   if (selectedTrend === "Day") {
-    if (btnNext.classList.contains("disable")) return;
     handleDayNavigation(1);
     //disbale bext button if current date is today
     const today = getTodayDate();
@@ -199,6 +181,28 @@ btnNext.addEventListener("click", function () {
 
     //enable prev button incase it is disabled
     enableButton(btnPrev);
+  } else if (selectedTrend === "Week") {
+    const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
+      currentDate,
+      7
+    );
+
+    currentDate = nextExpectedDate(currentDate, 7);
+
+    displayData(weeklyData);
+
+    //if currentdate is today then disable next button
+    const today = getTodayDate();
+    if (today === currentDate) disableButton(btnNext);
+  } else if (selectedTrend === "Month") {
+    enableButton(btnPrev);
+    currentMonth = currentMonth + 1;
+    const foundedData = getMonthData(currentMonth);
+
+    displayData(foundedData.reverse());
+
+    const thisMonth = getCurrentMonth();
+    if (currentMonth === thisMonth) disableButton(btnNext);
   }
 });
 
@@ -211,26 +215,20 @@ function showDayData(day = "") {
 
   displayData(foundedData);
 }
-function showWeekData() {
-  //find last 7 day's data
-  const today = getTodayDate();
-  currentDate = today;
+function showWeekData(startingDate) {
+  //find last 7 data starting from today
+  currentDate = startingDate;
+
   const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
     currentDate,
     -7
   );
 
-  displayData(weeklyData.reverse());
+  displayData(weeklyData);
 }
 function showMonthData() {
-  const today = getTodayDate();
-  currentDate = today;
-  const { data: monthlyData, newCurrentDate } = getDataFromStartDate(
-    currentDate,
-    -30
-  );
-
-  displayData(monthlyData.reverse());
+  const foundedData = getMonthData(currentMonth);
+  displayData(foundedData.reverse());
 }
 
 function displayData(arr) {
@@ -287,6 +285,11 @@ function getTodayDate() {
   return now.toISOString().split("T")[0];
 }
 
+function getCurrentMonth() {
+  const date = new Date();
+  return date.getMonth() + 1;
+}
+
 function disableButton(element) {
   element.classList.remove("cursor-pointer");
   element.classList.add("disable", "opacity-50", "cursor-not-allowed");
@@ -327,13 +330,11 @@ function getDataFromStartDate(startDateStr, numberOfDays) {
   if (numberOfDays >= 0) {
     rangeStart = new Date(baseDate);
     rangeEnd = new Date(baseDate);
-    // Move rangeEnd to the exact number of days forward (exclusive of the end day)
     rangeEnd.setDate(baseDate.getDate() + numberOfDays);
     rangeEnd.setHours(0, 0, 0, 0);
   } else {
     rangeEnd = new Date(baseDate);
     rangeStart = new Date(baseDate);
-    // Move rangeStart backward by the absolute value of numberOfDays
     rangeStart.setDate(baseDate.getDate() + numberOfDays); // numberOfDays is negative
     rangeStart.setHours(0, 0, 0, 0);
   }
@@ -341,15 +342,47 @@ function getDataFromStartDate(startDateStr, numberOfDays) {
   const foundedData = data.filter((obj) => {
     const entryDate = new Date(obj["date"]);
     entryDate.setHours(0, 0, 0, 0);
-    // Include dates >= rangeStart and < rangeEnd (strictly less than rangeEnd)
     return entryDate >= rangeStart && entryDate < rangeEnd;
   });
 
-  // Calculate newCurrentDate as rangeEnd (the next day after the last included day)
-  const newCurrentDate = rangeEnd.toISOString().split("T")[0];
+  // Fix: Use rangeEnd instead of rangeStart for newCurrentDate
+  let newCurrentDate = new Date(baseDate);
+  newCurrentDate.setDate(baseDate.getDate() + numberOfDays);
+  newCurrentDate.setHours(0, 0, 0, 0);
+  newCurrentDate = newCurrentDate.toISOString().split("T")[0];
 
   return {
     data: foundedData,
     newCurrentDate,
   };
+}
+
+function nextExpectedDate(statringDate, numberOfDays) {
+  const [year, month, day] = statringDate.split("-").map(Number);
+  const targetDate = new Date(year, month - 1, day); // month is 0-based
+
+  targetDate.setDate(targetDate.getDate() + numberOfDays);
+
+  const formatted = targetDate.toISOString().split("T")[0];
+
+  return formatted;
+}
+
+function getMonthData(month) {
+  return data.filter((obj) => {
+    const recordedDate = obj["date"];
+    const recordedMonth = recordedDate.split("-")[1];
+
+    if (Number(recordedMonth) === month) {
+      return obj;
+    }
+  });
+}
+function showError(message) {
+  const label = document.createElement("label");
+
+  label.classList = "text-gray-500 border-b-1 border-zinc-300";
+  label.textContent = message;
+
+  dataViewDiv.appendChild(label);
 }

@@ -12,13 +12,15 @@
     >
       <div
         id="cantainer"
-        class="p-10 bg-white rounded-xl shadow-xl flex flex-col gap-4"
+        class="overflow-auto bg-white rounded-xl shadow-xl flex flex-col gap-4 sm:p-10 p-4"
       >
         <div id="moodInputContainer" class="flex flex-col gap-2">
           <label class="text-3xl font-semibold text-center">
             How do you feel today?</label
           >
-          <div class="flex items-center gap-5 justify-between">
+          <div
+            class="flex items-center gap-5 justify-between sm:flex-row flex-col"
+          >
             <div class="flex gap-2 text-5xl items-center">
               <span data-mood="happy">😀</span>
               <span data-mood="sad">😞</span>
@@ -28,7 +30,7 @@
             </div>
             <button
               id="recordButton"
-              class="bg-blue-500 hover:bg-blue-600 px-6 py-4 rounded-lg text-white cursor-pointer"
+              class="bg-blue-500 hover:bg-blue-600 px-6 py-4 rounded-lg text-white cursor-pointer sm:w-auto w-full"
             >
               Record
             </button>
