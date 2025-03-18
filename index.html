@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mood Tracker App</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <div class="h-screen bg-gray-300 w-full flex items-center justify-center">
+      <div
+        id="cantainer"
+        class="p-10 bg-white rounded-xl shadow-xl flex flex-col gap-4"
+      >
+        <div id="moodInputContainer" class="flex flex-col gap-2">
+          <label class="text-3xl font-semibold text-center">
+            How do you feel today?</label
+          >
+          <div class="flex items-center gap-5 justify-between">
+            <div class="flex gap-2 text-5xl items-center">
+              <span data-mood="happy">😀</span>
+              <span data-mood="sad">😞</span>
+              <span data-mood="neutral">😐</span>
+              <span data-mood="worried">😟</span>
+              <span data-mood="party">🥳</span>
+            </div>
+            <button
+              id="recordButton"
+              class="bg-blue-500 hover:bg-blue-600 px-6 py-4 rounded-lg text-white cursor-pointer"
+            >
+              Record
+            </button>
+          </div>
+          <label id="messageLabel" class="text-gray-500 text-center hidden"
+            >You have already recorded today's mood</label
+          >
+        </div>
+        <div id="selectionDiv" class="flex justify-between">
+          <button
+            data-selection="Day"
+            class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
+          >
+            Day
+          </button>
+          <button
+            data-selection="Week"
+            class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
+          >
+            Week
+          </button>
+          <button
+            data-selection="Month"
+            class="border-1 p-2 rounded-xl text-zinc-600 border-dashed min-w-20"
+          >
+            Month
+          </button>
+        </div>
+        <div
+          id="showTimelineDiv"
+          class="bg-slate-200 py-4 flex flex-col text-gray-500 rounded-xl shadow-xl hidden"
+        >
+          <div class="mx-8 flex justify-between items-center">
+            <button class="cursor-pointer" id="btnPrev">◀️</button>
+            <label id="selectedTrendLabel">Week View</label>
+            <button class="cursor-pointer" id="btnNext">▶️</button>
+          </div>
+          <div class="border-b-1 mx-8 border-zinc-300 mt-2"></div>
+
+          <div id="dataView" class="mx-8 mt-5 flex flex-col">
+            <!-- <label class="text-gray-500">May 12, 2025 - 😊 Happy</label>
+            <label class="text-gray-500">May 12, 2025 - 😊 Happy</label>
+            <label class="text-gray-500">May 12, 2025 - 😊 Happy</label>
+            <label class="text-gray-500">May 12, 2025 - 😊 Happy</label>
+            <label class="text-gray-500">May 12, 2025 - 😊 Happy</label> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
