@@ -57,7 +57,7 @@ function storeData() {
   });
 });
 
-// store data
+// record(store) data
 recordButton.addEventListener("click", function () {
   const selectedElement = document.querySelector(".selected");
 
@@ -86,6 +86,7 @@ recordButton.addEventListener("click", function () {
   storeData();
 });
 
+//on click for Daily weekly and monthly button
 selectionButton.forEach((button) => {
   button.addEventListener("click", function () {
     // making sure other button not selected
@@ -102,6 +103,7 @@ selectionButton.forEach((button) => {
   });
 });
 
+//choose which trend has been selected
 function showSelectedTrend() {
   selectedTrendLabel.textContent = `${selectedTrend}'s Data`;
   disableButton(btnNext);
@@ -110,7 +112,6 @@ function showSelectedTrend() {
   switch (selectedTrend) {
     case "Day":
       currentDate = today;
-      showNextPrevButton();
       showDayData();
       break;
     case "Week":
@@ -172,15 +173,16 @@ btnNext.addEventListener("click", function () {
 
   if (selectedTrend === "Day") {
     handleDayNavigation(1);
+
+    //enable prev button incase it is disabled
+    enableButton(btnPrev);
+
     //disbale bext button if current date is today
     const today = getTodayDate();
     if (currentDate === today) {
       disableButton(btnNext);
       return;
     }
-
-    //enable prev button incase it is disabled
-    enableButton(btnPrev);
   } else if (selectedTrend === "Week") {
     const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
       currentDate,
@@ -206,6 +208,7 @@ btnNext.addEventListener("click", function () {
   }
 });
 
+//all functions related to day wise data
 function showDayData(day = "") {
   // if date is not provided then set today as day
   !day ? (day = getTodayDate()) : null;
@@ -213,31 +216,14 @@ function showDayData(day = "") {
   // find data from storage(array)
   const foundedData = data.filter((obj) => obj["date"] === day);
 
+  if (foundedData.length <= 0) {
+    showError("No Data Found");
+    return;
+  }
   displayData(foundedData);
 }
-function showWeekData(startingDate) {
-  //find last 7 data starting from today
-  currentDate = startingDate;
 
-  const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
-    currentDate,
-    -7
-  );
-
-  displayData(weeklyData);
-}
-function showMonthData() {
-  const foundedData = getMonthData(currentMonth);
-  displayData(foundedData.reverse());
-}
-
-function displayData(arr) {
-  dataViewDiv.innerHTML = "";
-  arr.map((data) => {
-    createLabel(data["date"], data.mood, data.emoji);
-  });
-}
-
+// day wise data function : provide date and either +1 or -1 to get next and previous day data
 function findDataByOffset(dateStr, offset) {
   const [year, month, day] = dateStr.split("-").map(Number);
   const targetDate = new Date(year, month - 1, day); // month is 0-based
@@ -254,6 +240,7 @@ function findDataByOffset(dateStr, offset) {
   return dataToReturn;
 }
 
+// get data of +1 or -1 date and show error if required
 function handleDayNavigation(offset) {
   if (selectedTrend !== "Day") return;
 
@@ -280,46 +267,20 @@ function handleDayNavigation(offset) {
   displayData(dataArray);
 }
 
-function getTodayDate() {
-  let now = new Date();
-  return now.toISOString().split("T")[0];
+//all functions related to week wise data
+function showWeekData(startingDate) {
+  //find last 7 data starting from today
+  currentDate = startingDate;
+
+  const { data: weeklyData, newCurrentDate } = getDataFromStartDate(
+    currentDate,
+    -7
+  );
+
+  displayData(weeklyData);
 }
 
-function getCurrentMonth() {
-  const date = new Date();
-  return date.getMonth() + 1;
-}
-
-function disableButton(element) {
-  element.classList.remove("cursor-pointer");
-  element.classList.add("disable", "opacity-50", "cursor-not-allowed");
-}
-function enableButton(element) {
-  element.classList.add("cursor-pointer");
-  element.classList.remove("disable", "opacity-50", "cursor-not-allowed");
-}
-
-function hideNextPrevButton() {
-  btnPrev.classList.add("hidden");
-  btnNext.classList.add("hidden");
-  btnNavigationDiv.classList.add("justify-center");
-}
-
-function showNextPrevButton() {
-  btnPrev.classList.remove("hidden");
-  btnNext.classList.remove("hidden");
-  btnNavigationDiv.classList.remove("justify-center");
-}
-
-function createLabel(dateToDisplay, mood, emoji) {
-  const label = document.createElement("label");
-
-  label.classList = "text-gray-500 border-b-1 border-zinc-300";
-  label.textContent = `${dateToDisplay} - ${mood}  ${emoji}`;
-
-  dataViewDiv.appendChild(label);
-}
-
+//to get weekly data by providing -7 or +7
 function getDataFromStartDate(startDateStr, numberOfDays) {
   const [year, month, day] = startDateStr.split("-").map(Number);
   const baseDate = new Date(year, month - 1, day); // The given date
@@ -357,6 +318,7 @@ function getDataFromStartDate(startDateStr, numberOfDays) {
   };
 }
 
+// to get starting date of weekly data
 function nextExpectedDate(statringDate, numberOfDays) {
   const [year, month, day] = statringDate.split("-").map(Number);
   const targetDate = new Date(year, month - 1, day); // month is 0-based
@@ -368,6 +330,13 @@ function nextExpectedDate(statringDate, numberOfDays) {
   return formatted;
 }
 
+//all functions related to month wise data
+function showMonthData() {
+  const foundedData = getMonthData(currentMonth);
+  displayData(foundedData.reverse());
+}
+
+//get whole month data by providing month
 function getMonthData(month) {
   return data.filter((obj) => {
     const recordedDate = obj["date"];
@@ -378,7 +347,47 @@ function getMonthData(month) {
     }
   });
 }
+
+//loop through provided array to display founded data
+function displayData(arr) {
+  dataViewDiv.innerHTML = "";
+  arr.map((data) => {
+    createLabel(data["date"], data.mood, data.emoji);
+  });
+}
+
+// genral function
+function getTodayDate() {
+  let now = new Date();
+  return now.toISOString().split("T")[0];
+}
+
+function getCurrentMonth() {
+  const date = new Date();
+  return date.getMonth() + 1;
+}
+
+function disableButton(element) {
+  element.classList.remove("cursor-pointer");
+  element.classList.add("disable", "opacity-50", "cursor-not-allowed");
+}
+function enableButton(element) {
+  element.classList.add("cursor-pointer");
+  element.classList.remove("disable", "opacity-50", "cursor-not-allowed");
+}
+
+// creating label using provided object data
+function createLabel(dateToDisplay, mood, emoji) {
+  const label = document.createElement("label");
+
+  label.classList = "text-gray-500 border-b-1 border-zinc-300";
+  label.textContent = `${dateToDisplay} - ${mood}  ${emoji}`;
+
+  dataViewDiv.appendChild(label);
+}
+
 function showError(message) {
+  dataViewDiv.innerHTML = "";
   const label = document.createElement("label");
 
   label.classList = "text-gray-500 border-b-1 border-zinc-300";
