@@ -17,6 +17,7 @@ let data;
 
 window.addEventListener("load", async (event) => {
   await loadData();
+  storeData();
 });
 
 //load data from local storage
@@ -73,7 +74,7 @@ recordButton.addEventListener("click", function () {
   if (i > -1) {
     // show error
     messageLabel.classList.remove("hidden");
-
+    messageLabel.textContent = "You have already recorded today's mood";
     setTimeout(() => {
       messageLabel.classList.add("hidden");
     }, 2000);
@@ -84,6 +85,13 @@ recordButton.addEventListener("click", function () {
   //save data
   data = [...data, { emoji, mood, date: today }];
   storeData();
+  // show message
+  messageLabel.classList.remove("hidden");
+  messageLabel.textContent = "Your mood is stored.";
+
+  setTimeout(() => {
+    messageLabel.classList.add("hidden");
+  }, 2000);
 });
 
 //on click for Daily weekly and monthly button
