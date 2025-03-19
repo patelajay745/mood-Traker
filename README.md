@@ -1,6 +1,6 @@
 # Daily mood tracker
 
-This Application is buit using html, tailwind and vanilla JS.
+This Application is built using html, tailwind and vanilla JS.
 
 ## Application features
 
