@@ -265,7 +265,7 @@ function handleDayNavigation(offset) {
     const label = document.createElement("label");
     label.textContent = "No more data available";
     dataViewDiv.appendChild(label);
-    disableButton(btnPrev);
+    enableButton(btnNext);
     return;
   }
 
