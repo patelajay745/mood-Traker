@@ -7,7 +7,7 @@ This Application is built using html, tailwind and vanilla JS.
 - User can store his/her moon once in a day.
 - User can we past data by daily,weekly and monthly.
 - I have seeded dummy data to view.
-- All the data will be stored io local Storage.
+- All the data will be stored in local Storage.
 
 ## Screenshots
 
